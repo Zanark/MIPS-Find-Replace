@@ -1,18 +1,18 @@
                 .data
 
-    head1: .asciiz "FIND & REPLACE"
-    head2: .asciiz "\n This program helps the user to \n--->  Find a word in the paragrah entered by the user and \n--->  Replace it with another word of user's choice"
+    head1: .asciiz "\n\n\t\t\t\t\t\t\t\tFIND & REPLACE"
+    head2: .asciiz "\n This program helps the user to \n\n--->  Find a word in the paragrah entered by the user and \n--->  Replace it with another word of user's choice\n\n"
 
-    input_paragraph: .asciiz "Enter a paragraph: "
-    input_target: .asciiz "Enter target word: "
-    input_replacement: .asciiz "Enter the replacement word: "
-    output_times: .asciiz "The target was found: "
-    output_paragraph: .asciiz " times\nThe final paragraph is:\n"
+    input_paragraph: .asciiz "\nEnter a paragraph: "
+    input_target: .asciiz "\nEnter target word: "
+    input_replacement: .asciiz "\nEnter the replacement word: "
+    output_times: .asciiz "\nThe target was found: "
+    output_paragraph: .asciiz " times\n\nThe final paragraph is:\n\n"
 
     error_length: .asciiz "Error: Replacement word should be same size as target!\n"
     error_not_found: .asciiz "Could not find target word in given paragraph.\n"
 
-    horizon: .asciiz "\n----------------------------------------------------------------------------------------------------------------\n"
+    horizon: .asciiz "\n\n----------------------------------------------------------------------------------------------------------------\n\n"
 
     paragraph: .space 1501
     target: .space 51
@@ -215,6 +215,10 @@
 
         # If target wasn't found even once, show appropriate error message
         beq $s4, $0, ERROR_NOT_FOUND
+        
+        la $a0, horizon # Horizontal Line
+        li $v0, 4
+        syscall
 
         # Print number of times the target was found
         la $a0, output_times
@@ -234,14 +238,20 @@ syscall
 
 j EXIT
 
-ERROR_NOT_FOUND: la $a0, error_not_found        # Target not found
+ERROR_NOT_FOUND: la $a0, horizon # Horizontal Line
+                 li $v0, 4
+                 syscall
+                 la $a0, error_not_found        # Target not found
                  li $v0, 4
                  syscall
                  j EXIT
 
-ERROR: la $a0, error_length                     # Lengths of target and replacement are not equal
-       li $v0, 4
-       syscall
+ERROR:  la $a0, horizon # Horizontal Line
+        li $v0, 4
+        syscall
+        la $a0, error_length                     # Lengths of target and replacement are not equal
+        li $v0, 4
+        syscall
 
 # Exit
 EXIT: li $v0, 10

@@ -159,8 +159,8 @@
         la $a0, input_paragraph
         li $v0, 4
         syscall
-        la $a0, paragraph
-        lw $a1, paragraph_limit
+        la $a0, paragraph           # Base address of papragraph in $a0
+        lw $a1, paragraph_limit     # Size of paragraph
         li $v0, 8
         syscall
 
@@ -168,8 +168,8 @@
         la $a0, input_target
         li $v0, 4
         syscall
-        la $a0, target
-        lw $a1, target_limit
+        la $a0, target              # Base address of target in $a0
+        lw $a1, target_limit        # Size of target
         li $v0, 8
         syscall
 
@@ -177,8 +177,8 @@
         la $a0, input_replacement
         li $v0, 4
         syscall
-        la $a0, replacement
-        lw $a1, replacement_limit
+        la $a0, replacement         # Base address of replacement in $a0
+        lw $a1, replacement_limit   # Size of replacement
         li $v0, 8
         syscall
 
@@ -207,9 +207,43 @@
         sub $t1, $s2, $t1
         bne $t0, $t1, ERROR
 
-        add $a0, $s0, $0
-        add $a1, $s1, $0
-        add $a2, $s2, $0
+        add $a0, $s0, $0    # Paragraph's Last Character
+        add $a1, $s1, $0    # Target's Last Character
+        add $a2, $s2, $0    # Replacement's Last Character
         jal findTarget
         add $s4, $v0, $0
+
+        # If target wasn't found even once, show appropriate error message
+        beq $s4, $0, ERROR_NOT_FOUND
+
+        # Print number of times the target was found
+        la $a0, output_times
+        li $v0, 4
+        syscall
+        add $a0, $s4, $0
+        li $v0, 1
+        syscall
+
+        # Print the final string
+        la $a0, output_paragraph
+        li $v0, 4
+        syscall
+        la $a0, paragraph
+li $v0, 4
+syscall
+
+j EXIT
+
+ERROR_NOT_FOUND: la $a0, error_not_found        # Target not found
+                 li $v0, 4
+                 syscall
+                 j EXIT
+
+ERROR: la $a0, error_length                     # Lengths of target and replacement are not equal
+       li $v0, 4
+       syscall
+
+# Exit
+EXIT: li $v0, 10
+      syscall
 
